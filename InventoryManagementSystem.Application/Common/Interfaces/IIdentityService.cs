@@ -15,6 +15,8 @@ public interface IIdentityService
 
     Task<Result<AppUserDto>> GetUserByIdAsync(string userId);
 
+    Task<Result<AppUserDto>> UpdateProfileAsync(string userId, UpdateProfileRequest request, CancellationToken cancellationToken = default);
+
     Task<List<AppUserDto>> GetActiveUsersAsync(CancellationToken cancellationToken = default);
 
     Task<List<AppUserDto>> GetDeletedUsersAsync(CancellationToken cancellationToken = default);

@@ -11,10 +11,6 @@ public static class ProductErrors
         Error.Validation("Name_Required", "Product name is required");
     public static Error PriceInvalid =>
         Error.Validation("Price_Invalid", "Product price cannot be negative.");
-    public static Error QuantityRequired =>
-        Error.Validation("Quantity_Required", "Quantity is required");
-    public static Error QuantityInvalid => 
-        Error.Validation("Quantity_Invalid", "Product quantity cannot be negative.");
     
     public static Error CategoryRequired =>
         Error.Validation("Category_Required", "Category is required");
@@ -31,5 +27,23 @@ public static class ProductErrors
     public static readonly Error DuplicateName = Error.Conflict(
         "Product.DuplicateName",
         "Product name already exists.");
-    
+
+    public static Error CategoryNotFound =>
+        Error.NotFound("Product.CategoryNotFound", "Category not found.");
+
+    public static Error UnitNotFound =>
+        Error.NotFound("Product.UnitNotFound", "Unit not found.");
+
+    public static readonly Error UnitConflict = Error.Conflict(
+        "Unit.Conflict",
+        "Unit name already exists.");
+
+    public static readonly Error CannotDeleteUnitWithProducts = Error.Conflict(
+        "Unit.CannotDelete",
+        "Cannot delete unit with products.");
+
+    public static readonly Error CannotDeleteProductWithReferences = Error.Conflict(
+        "Product.CannotDelete",
+        "Cannot delete product because it is referenced by invoices, stock items, or stock movements.");
+
 }

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace InventoryManagementSystem.Domain.Common.Results;
 
 public static class Result
@@ -26,6 +28,14 @@ public sealed class Result<TValue> : IResult
         IsSuccess = false;
     }
 
+    [JsonConstructor]
+    public Result(bool isSuccess, TValue? value, List<Error>? errors)
+    {
+        IsSuccess = isSuccess;
+        this.value = value;
+        this.errors = errors ?? [];
+    }
+
     public bool IsSuccess { get; }
 
     public bool IsError => !IsSuccess;
@@ -36,12 +46,11 @@ public sealed class Result<TValue> : IResult
     public List<Error> Errors => IsSuccess ? [] : errors;
 
     public TNextValue Match<TNextValue>(Func<TValue, TNextValue> onValue, Func<List<Error>, TNextValue> onError)
-        => IsSuccess ? onValue(Value) : onError(Errors);
+        => IsSuccess ?
+            onValue(Value) : onError(Errors);
 
     public static implicit operator Result<TValue>(TValue value) => new(value);
-
     public static implicit operator Result<TValue>(Error error) => new([error]);
-
     public static implicit operator Result<TValue>(List<Error> errors) => new(errors);
 }
 

@@ -1,12 +1,20 @@
 using InventoryManagementSystem.Domain.Common;
+using InventoryManagementSystem.Domain.Product;
+using InventoryManagementSystem.Domain.Warehouse;
 
 namespace InventoryManagementSystem.Domain.Stock;
 
 public sealed class StockMovement : AuditableEntity
 {
+    public Guid StockItemId { get; private set; }
+
     public Guid ProductId { get; private set; }
 
+    public Product.Product Product { get; private set; } = null!;
+
     public Guid WarehouseId { get; private set; }
+
+    public Warehouse.Warehouse Warehouse { get; private set; } = null!;
 
     public StockMovementType Type { get; private set; }
 
@@ -21,6 +29,7 @@ public sealed class StockMovement : AuditableEntity
     }
 
     internal StockMovement(
+        Guid stockItemId,
         Guid productId,
         Guid warehouseId,
         StockMovementType type,
@@ -28,6 +37,7 @@ public sealed class StockMovement : AuditableEntity
         string? referenceNumber = null,
         string? notes = null)
     {
+        StockItemId = stockItemId;
         ProductId = productId;
         WarehouseId = warehouseId;
         Type = type;

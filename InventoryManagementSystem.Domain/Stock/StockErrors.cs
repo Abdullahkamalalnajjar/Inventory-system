@@ -15,4 +15,10 @@ public static class StockErrors
 
     public static Error InsufficientQuantity =>
         Error.Conflict("Stock_Insufficient_Quantity", "There is not enough quantity in stock.");
+
+    public static Error StockItemNotFound =>
+        Error.NotFound("Stock_Item_Not_Found", "Stock item not found.");
+
+    public static Error StockItemAlreadyExists =>
+        Error.Conflict("Stock_Item_Already_Exists", "Stock item already exists for this product and warehouse.");
 }

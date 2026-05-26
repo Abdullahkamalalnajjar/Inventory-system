@@ -19,6 +19,11 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(product => product.Description)
             .HasMaxLength(1000);
 
+        builder.HasOne(product => product.Category)
+            .WithMany()
+            .HasForeignKey(product => product.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Property(product => product.Price)
             .HasPrecision(18, 2);
 

@@ -1,5 +1,7 @@
 using InventoryManagementSystem.Domain.Common;
 using InventoryManagementSystem.Domain.Common.Results;
+using InventoryManagementSystem.Domain.Product;
+using InventoryManagementSystem.Domain.Warehouse;
 
 namespace InventoryManagementSystem.Domain.Stock;
 
@@ -9,7 +11,11 @@ public sealed class StockItem : AuditableEntity
 
     public Guid ProductId { get; private set; }
 
+    public Product.Product Product { get; private set; } = null!;
+
     public Guid WarehouseId { get; private set; }
+
+    public Warehouse.Warehouse Warehouse { get; private set; } = null!;
 
     public int QuantityOnHand { get; private set; }
 
@@ -36,7 +42,7 @@ public sealed class StockItem : AuditableEntity
         return new StockItem(productId, warehouseId);
     }
 
-    public Result<Updated> AddQuantity(
+    public Result<StockMovement> AddQuantity(
         int quantity,
         StockMovementType type = StockMovementType.Purchase,
         string? referenceNumber = null,
@@ -45,13 +51,15 @@ public sealed class StockItem : AuditableEntity
         if (quantity <= 0)
             return StockErrors.QuantityInvalid;
 
-        QuantityOnHand += quantity;
-        movements.Add(new StockMovement(ProductId, WarehouseId, type, quantity, referenceNumber, notes));
+        var movement = new StockMovement(Id, ProductId, WarehouseId, type, quantity, referenceNumber, notes);
 
-        return Result.Updated;
+        QuantityOnHand += quantity;
+        movements.Add(movement);
+
+        return movement;
     }
 
-    public Result<Updated> RemoveQuantity(
+    public Result<StockMovement> RemoveQuantity(
         int quantity,
         StockMovementType type = StockMovementType.Sale,
         string? referenceNumber = null,
@@ -63,31 +71,38 @@ public sealed class StockItem : AuditableEntity
         if (QuantityOnHand < quantity)
             return StockErrors.InsufficientQuantity;
 
-        QuantityOnHand -= quantity;
-        movements.Add(new StockMovement(ProductId, WarehouseId, type, quantity, referenceNumber, notes));
+        var movement = new StockMovement(Id, ProductId, WarehouseId, type, quantity, referenceNumber, notes);
 
-        return Result.Updated;
+        QuantityOnHand -= quantity;
+        movements.Add(movement);
+
+        return movement;
     }
 
-    public Result<Updated> AdjustQuantity(int newQuantity, string? referenceNumber = null, string? notes = null)
+    public Result<StockMovement?> AdjustQuantity(int newQuantity, string? referenceNumber = null, string? notes = null)
     {
         if (newQuantity < 0)
             return StockErrors.QuantityInvalid;
 
         var difference = newQuantity - QuantityOnHand;
+        StockMovement? movement = null;
+
         QuantityOnHand = newQuantity;
 
         if (difference != 0)
         {
-            movements.Add(new StockMovement(
+            movement = new StockMovement(
+                Id,
                 ProductId,
                 WarehouseId,
                 StockMovementType.Adjustment,
                 Math.Abs(difference),
                 referenceNumber,
-                notes));
+                notes);
+
+            movements.Add(movement);
         }
 
-        return Result.Updated;
+        return movement;
     }
 }

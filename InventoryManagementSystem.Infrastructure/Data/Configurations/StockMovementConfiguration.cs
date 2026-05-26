@@ -14,18 +14,21 @@ public sealed class StockMovementConfiguration : IEntityTypeConfiguration<StockM
 
         builder.HasKey(stockMovement => stockMovement.Id);
 
+        builder.Property(stockMovement => stockMovement.StockItemId)
+            .IsRequired();
+
         builder.Property(stockMovement => stockMovement.ReferenceNumber)
             .HasMaxLength(100);
 
         builder.Property(stockMovement => stockMovement.Notes)
             .HasMaxLength(1000);
 
-        builder.HasOne<Product>()
+        builder.HasOne(stockMovement => stockMovement.Product)
             .WithMany()
             .HasForeignKey(stockMovement => stockMovement.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<Warehouse>()
+        builder.HasOne(stockMovement => stockMovement.Warehouse)
             .WithMany()
             .HasForeignKey(stockMovement => stockMovement.WarehouseId)
             .OnDelete(DeleteBehavior.Restrict);

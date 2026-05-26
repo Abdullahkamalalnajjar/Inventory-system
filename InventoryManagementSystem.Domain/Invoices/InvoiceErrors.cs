@@ -27,4 +27,13 @@ public static class InvoiceErrors
 
     public static Error CannotChangePostedInvoice =>
         Error.Conflict("Invoice_Cannot_Change_Posted", "Posted invoice cannot be changed.");
+
+    public static Error InvoiceNotFound =>
+        Error.NotFound("Invoice_Not_Found", "Invoice not found.");
+
+    public static Error InvoiceItemNotFound =>
+        Error.NotFound("Invoice_Item_Not_Found", "Invoice item not found.");
+
+    public static Error InvoiceNumberExists =>
+        Error.Conflict("Invoice_Number_Exists", "Invoice number already exists.");
 }

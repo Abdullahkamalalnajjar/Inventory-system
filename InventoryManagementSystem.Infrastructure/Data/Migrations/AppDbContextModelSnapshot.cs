@@ -246,6 +246,9 @@ namespace InventoryManagementSystem.Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTimeOffset>("CreatedAtUtc")
                         .HasColumnType("datetimeoffset");
 
@@ -271,13 +274,12 @@ namespace InventoryManagementSystem.Infrastructure.Data.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
                     b.Property<Guid>("UnitId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("Name");
 
@@ -391,7 +393,7 @@ namespace InventoryManagementSystem.Infrastructure.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid?>("StockItemId")
+                    b.Property<Guid>("StockItemId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Type")
@@ -701,11 +703,19 @@ namespace InventoryManagementSystem.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("InventoryManagementSystem.Domain.Product.Product", b =>
                 {
+                    b.HasOne("InventoryManagementSystem.Domain.Product.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("InventoryManagementSystem.Domain.Product.Unit", null)
                         .WithMany()
                         .HasForeignKey("UnitId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("InventoryManagementSystem.Domain.Stock.StockItem", b =>
@@ -734,7 +744,8 @@ namespace InventoryManagementSystem.Infrastructure.Data.Migrations
                     b.HasOne("InventoryManagementSystem.Domain.Stock.StockItem", null)
                         .WithMany("Movements")
                         .HasForeignKey("StockItemId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("InventoryManagementSystem.Domain.Warehouse.Warehouse", null)
                         .WithMany()

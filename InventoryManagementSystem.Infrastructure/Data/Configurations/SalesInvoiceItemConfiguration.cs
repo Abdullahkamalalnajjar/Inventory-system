@@ -16,7 +16,7 @@ public sealed class SalesInvoiceItemConfiguration : IEntityTypeConfiguration<Sal
         builder.Property(item => item.UnitPrice)
             .HasPrecision(18, 2);
 
-        builder.HasOne<Product>()
+        builder.HasOne(item => item.Product)
             .WithMany()
             .HasForeignKey(item => item.ProductId)
             .OnDelete(DeleteBehavior.Restrict);

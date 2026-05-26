@@ -20,7 +20,7 @@ public sealed class PurchaseInvoiceConfiguration : IEntityTypeConfiguration<Purc
         builder.HasIndex(invoice => invoice.InvoiceNumber)
             .IsUnique();
 
-        builder.HasOne<Warehouse>()
+        builder.HasOne(invoice => invoice.Warehouse)
             .WithMany()
             .HasForeignKey(invoice => invoice.WarehouseId)
             .OnDelete(DeleteBehavior.Restrict);

@@ -1,10 +1,13 @@
 using InventoryManagementSystem.Domain.Common;
+using InventoryManagementSystem.Domain.Product;
 
 namespace InventoryManagementSystem.Domain.Invoices;
 
 public sealed class PurchaseInvoiceItem : Entity
 {
     public Guid ProductId { get; private set; }
+
+    public Product.Product Product { get; private set; } = null!;
 
     public int Quantity { get; private set; }
 

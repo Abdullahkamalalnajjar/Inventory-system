@@ -29,40 +29,21 @@ public class CachingBehavior<TRequest, TResponse>(
 
         _logger.LogInformation("Checking cache for {RequestName}", typeof(TRequest).Name);
 
-        var result = await _cache.GetOrCreateAsync<TResponse>(
+        var result = await _cache.GetOrCreateAsync(
             cachedRequest.CacheKey,
-            _ => new ValueTask<TResponse>((TResponse)(object)null!),
+            async token => await next(token),
             new HybridCacheEntryOptions
             {
-                Flags = HybridCacheEntryFlags.DisableUnderlyingData
+                Expiration = cachedRequest.Expiration
             },
+            cachedRequest.Tags,
             cancellationToken: ct);
 
-        if (result is not null)
+        if (result is IResult res && !res.IsSuccess)
         {
-            _logger.LogInformation("Returning {RequestName} result from cache", typeof(TRequest).Name);
-            return result!;
+            await _cache.RemoveAsync(cachedRequest.CacheKey, ct);
         }
 
-        _logger.LogInformation("Fetching {RequestName} from DB", typeof(TRequest).Name);
-
-        result = await next(ct);
-
-        if (result is IResult res && res.IsSuccess)
-        {
-            _logger.LogInformation("Caching result for {RequestName}", typeof(TRequest).Name);
-
-            await _cache.SetAsync(
-                cachedRequest.CacheKey,
-                result,
-                new HybridCacheEntryOptions
-                {
-                    Expiration = cachedRequest.Expiration
-                },
-                cachedRequest.Tags,
-                ct);
-        }
-
-        return result!;
+        return result;
     }
 }

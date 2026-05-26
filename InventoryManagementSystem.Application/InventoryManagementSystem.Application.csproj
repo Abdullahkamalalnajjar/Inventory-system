@@ -18,7 +18,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\" />
+    <Folder Include="Features\Products\Commands\CreateProduct\" />
+    <Folder Include="Features\Products\Commands\DeleteProduct\" />
+    <Folder Include="Features\Products\Dtos\" />
+    <Folder Include="Features\Units\Commands\UpdateUnit\" />
+    <Folder Include="Features\Units\Mappers\" />
+    <Folder Include="Features\Units\Queries\" />
+    <Folder Include="Features\Warehouses\Commands\CreateWarehouse\" />
+    <Folder Include="Features\Warehouses\Dtos\" />
+    <Folder Include="Features\Warehouses\Mappers\" />
+    <Folder Include="Features\Warehouses\Queries\" />
   </ItemGroup>
 
 </Project>

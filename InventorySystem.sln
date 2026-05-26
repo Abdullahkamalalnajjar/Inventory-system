@@ -2,8 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-69D9-4A1F-ADDB-95363F5D9B3D}") = "src", "src", "{E5F3A4B2-3C2C-4A3E-8B5F-9D2A8D4B6F11}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryManagementSystem.Api", "InventoryManagementSystem.Api\InventoryManagementSystem.Api.csproj", "{0ACCE956-4720-991F-0C0C-8BE1F10DA60D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryManagementSystem.Domain", "InventoryManagementSystem.Domain\InventoryManagementSystem.Domain.csproj", "{3006A879-0BF9-B7C6-F612-285A256810E2}"

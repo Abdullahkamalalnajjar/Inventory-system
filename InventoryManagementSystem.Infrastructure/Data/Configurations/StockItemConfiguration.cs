@@ -17,19 +17,19 @@ public sealed class StockItemConfiguration : IEntityTypeConfiguration<StockItem>
         builder.HasIndex(stockItem => new { stockItem.ProductId, stockItem.WarehouseId })
             .IsUnique();
 
-        builder.HasOne<Product>()
+        builder.HasOne(stockItem => stockItem.Product)
             .WithMany()
             .HasForeignKey(stockItem => stockItem.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<Warehouse>()
+        builder.HasOne(stockItem => stockItem.Warehouse)
             .WithMany()
             .HasForeignKey(stockItem => stockItem.WarehouseId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(stockItem => stockItem.Movements)
             .WithOne()
-            .HasForeignKey("StockItemId")
+            .HasForeignKey(stockMovement => stockMovement.StockItemId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Navigation(stockItem => stockItem.Movements)

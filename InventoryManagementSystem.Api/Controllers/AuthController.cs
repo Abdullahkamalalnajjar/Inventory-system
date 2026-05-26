@@ -16,6 +16,7 @@ public sealed class AuthController(IIdentityService identityService, ITokenProvi
     private const string ForceLogoutHeaderName = "X-Force-Logout";
 
     [HttpPost("signup")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(Result<TokenResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(Result<object?>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(Result<object?>), StatusCodes.Status409Conflict)]
@@ -38,6 +39,7 @@ public sealed class AuthController(IIdentityService identityService, ITokenProvi
     }
 
     [HttpPost("token/generate")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(Result<TokenResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Result<object?>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(Result<object?>), StatusCodes.Status401Unauthorized)]
@@ -60,6 +62,7 @@ public sealed class AuthController(IIdentityService identityService, ITokenProvi
     }
 
     [HttpPost("token/refresh-token")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(Result<TokenResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Result<object?>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(Result<object?>), StatusCodes.Status401Unauthorized)]
@@ -107,6 +110,32 @@ public sealed class AuthController(IIdentityService identityService, ITokenProvi
         }
 
         var result = await identityService.GetUserByIdAsync(userId);
+
+        return result.Match(
+            onValue: user =>
+            {
+                Result<AppUserDto> response = user;
+                return Ok(response);
+            },
+            onError: Problem);
+    }
+
+    [HttpPut("current-user/profile")]
+    [Authorize(Policy = AuthorizationPolicies.AuthenticatedUser)]
+    [ProducesResponseType(typeof(Result<AppUserDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<object?>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Result<object?>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(Result<object?>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Result<object?>), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> UpdateCurrentUserProfile([FromBody] UpdateProfileRequest request, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Problem([Error.Unauthorized("Invalid_Token", "Authenticated user identifier is missing.")]);
+        }
+
+        var result = await identityService.UpdateProfileAsync(userId, request, cancellationToken);
 
         return result.Match(
             onValue: user =>

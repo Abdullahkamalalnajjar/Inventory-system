@@ -144,6 +144,62 @@ public static class DependencyInjection
             options.AddPolicy(AuthorizationPolicies.PaymentsCheckout, policy =>
                 policy.RequireAuthenticatedUser()
                     .RequireClaim(PermissionClaimTypes.Permission, Permissions.Payments.Checkout));
+
+            options.AddPolicy(AuthorizationPolicies.CategoriesRead, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.Categories.Read));
+
+            options.AddPolicy(AuthorizationPolicies.CategoriesWrite, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.Categories.Write));
+
+            options.AddPolicy(AuthorizationPolicies.UnitsRead, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.Units.Read));
+
+            options.AddPolicy(AuthorizationPolicies.UnitsWrite, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.Units.Write));
+
+            options.AddPolicy(AuthorizationPolicies.ProductsRead, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.Products.Read));
+
+            options.AddPolicy(AuthorizationPolicies.ProductsWrite, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.Products.Write));
+
+            options.AddPolicy(AuthorizationPolicies.WarehousesRead, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.Warehouses.Read));
+
+            options.AddPolicy(AuthorizationPolicies.WarehousesWrite, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.Warehouses.Write));
+
+            options.AddPolicy(AuthorizationPolicies.StockRead, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.Stock.Read));
+
+            options.AddPolicy(AuthorizationPolicies.StockWrite, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.Stock.Write));
+
+            options.AddPolicy(AuthorizationPolicies.PurchaseInvoicesRead, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.PurchaseInvoices.Read));
+
+            options.AddPolicy(AuthorizationPolicies.PurchaseInvoicesWrite, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.PurchaseInvoices.Write));
+
+            options.AddPolicy(AuthorizationPolicies.SalesInvoicesRead, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.SalesInvoices.Read));
+
+            options.AddPolicy(AuthorizationPolicies.SalesInvoicesWrite, policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim(PermissionClaimTypes.Permission, Permissions.SalesInvoices.Write));
         });
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<AppDbContext>());

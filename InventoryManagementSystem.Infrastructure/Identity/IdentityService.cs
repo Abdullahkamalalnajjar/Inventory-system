@@ -137,6 +137,61 @@ public sealed class IdentityService(
         return await BuildAppUserDtoAsync(user, roles);
     }
 
+    public async Task<Result<AppUserDto>> UpdateProfileAsync(
+        string userId,
+        UpdateProfileRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await FindActiveUserByIdAsync(userId, cancellationToken);
+        if (user is null)
+        {
+            return Error.NotFound("User_Not_Found", $"User with id '{userId}' was not found.");
+        }
+
+        var roles = await userManager.GetRolesAsync(user);
+        if (roles.Any(role => string.Equals(role, Role.Member.ToString(), StringComparison.OrdinalIgnoreCase)))
+        {
+            if (string.IsNullOrWhiteSpace(request.City))
+            {
+                return Error.Validation("City_Required", "City is required for members.");
+            }
+
+            if (string.IsNullOrWhiteSpace(request.PhoneNumber))
+            {
+                return Error.Validation("Phone_Required", "Phone number is required for members.");
+            }
+        }
+
+        var email = request.Email.Trim();
+        var normalizedEmail = userManager.NormalizeEmail(email);
+        var existingUser = await userManager.Users
+            .FirstOrDefaultAsync(candidate =>
+                candidate.NormalizedEmail == normalizedEmail &&
+                candidate.Id != user.Id,
+                cancellationToken);
+
+        if (existingUser is not null)
+        {
+            return Error.Conflict("Email_Already_Exists", $"A user with email {UtilityService.MaskEmail(request.Email)} already exists.");
+        }
+
+        user.Email = email;
+        user.UserName = email;
+        user.NormalizedEmail = normalizedEmail;
+        user.NormalizedUserName = userManager.NormalizeName(email);
+        user.City = string.IsNullOrWhiteSpace(request.City) ? null : request.City.Trim();
+        user.PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim();
+
+        var updateResult = await userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            return ToErrors(updateResult.Errors);
+        }
+
+        await userManager.UpdateSecurityStampAsync(user);
+        return await BuildAppUserDtoAsync(user, roles);
+    }
+
     public Task<List<AppUserDto>> GetActiveUsersAsync(CancellationToken cancellationToken = default)
         => GetUsersByDeletionStatusAsync(false, cancellationToken);
 
@@ -267,8 +322,8 @@ public sealed class IdentityService(
             user.PhoneNumber);
     }
 
-    private Task<AppUser?> FindActiveUserByIdAsync(string userId)
-        => userManager.Users.FirstOrDefaultAsync(user => user.Id == userId && !user.IsDeleted);
+    private Task<AppUser?> FindActiveUserByIdAsync(string userId, CancellationToken cancellationToken = default)
+        => userManager.Users.FirstOrDefaultAsync(user => user.Id == userId && !user.IsDeleted, cancellationToken);
 
     private Task<AppUser?> FindActiveUserByEmailAsync(string email)
     {

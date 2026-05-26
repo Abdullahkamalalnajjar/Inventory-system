@@ -1,5 +1,6 @@
 using InventoryManagementSystem.Domain.Common;
 using InventoryManagementSystem.Domain.Common.Results;
+using InventoryManagementSystem.Domain.Warehouse;
 
 namespace InventoryManagementSystem.Domain.Invoices;
 
@@ -10,6 +11,8 @@ public sealed class SalesInvoice : AuditableEntity
     public string InvoiceNumber { get; private set; } = string.Empty;
 
     public Guid WarehouseId { get; private set; }
+
+    public Warehouse.Warehouse Warehouse { get; private set; } = null!;
 
     public Guid? CustomerId { get; private set; }
 
@@ -69,6 +72,20 @@ public sealed class SalesInvoice : AuditableEntity
         items.Add(new SalesInvoiceItem(productId, quantity, unitPrice));
 
         return Result.Updated;
+    }
+
+    public Result<Deleted> RemoveItem(Guid itemId)
+    {
+        if (Status != InvoiceStatus.Draft)
+            return InvoiceErrors.CannotChangePostedInvoice;
+
+        var item = items.FirstOrDefault(i => i.Id == itemId);
+        if (item is null)
+            return InvoiceErrors.InvoiceItemNotFound;
+
+        items.Remove(item);
+
+        return Result.Deleted;
     }
 
     public Result<Updated> Post()
